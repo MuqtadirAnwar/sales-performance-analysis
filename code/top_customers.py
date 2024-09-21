@@ -1,46 +1,33 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 
-# Load the cleaned dataset
-file_path = '../data/new_retail_data.csv'
-data_cleaned = pd.read_csv(file_path)
+# Load your data into a Pandas DataFrame
+data = pd.read_csv('../data/new_retail_data.csv')
 
-# Handle missing values and correct data types
-data_cleaned = data_cleaned.dropna()
-data_cleaned['Transaction_ID'] = data_cleaned['Transaction_ID'].astype(int)
-data_cleaned['Customer_ID'] = data_cleaned['Customer_ID'].astype(int)
-data_cleaned['Phone'] = data_cleaned['Phone'].astype(int)
-data_cleaned['Zipcode'] = data_cleaned['Zipcode'].astype(int)
-data_cleaned['Age'] = data_cleaned['Age'].astype(int)
-data_cleaned['Year'] = data_cleaned['Year'].astype(int)
-data_cleaned['Total_Purchases'] = data_cleaned['Total_Purchases'].astype(int)
-data_cleaned['Amount'] = data_cleaned['Amount'].astype(float)
-data_cleaned['Total_Amount'] = data_cleaned['Total_Amount'].astype(float)
-data_cleaned['Ratings'] = data_cleaned['Ratings'].astype(float)
-data_cleaned['Date'] = pd.to_datetime(data_cleaned['Date'])
-data_cleaned['Time'] = pd.to_datetime(data_cleaned['Time'], format='%H:%M:%S').dt.time
-data_cleaned = data_cleaned.drop_duplicates(subset='Transaction_ID')
+# Calculate Customer Score
+w1 = 0.7
+w2 = 0.3
+data['Customer_Score'] = (w1 * data['Total_Amount']) + (w2 * data['Ratings'])
 
-# Step 1: Customer Segmentation
-data_cleaned['Customer_Segment'] = pd.qcut(data_cleaned['Total_Amount'], q=4, labels=['Low', 'Medium', 'High', 'Very High'])
+# Get the top 10 customers based on Customer Score
+top_customers = data.sort_values(by='Customer_Score', ascending=False).head(10)
 
-# Step 2: Visualization
-plt.figure(figsize=(12, 6))
+# Find the most frequented store for each top customer
+most_frequented_stores = top_customers.groupby('Name')['Product_Brand'].agg(lambda x: x.value_counts().index[0])
 
-# Bar chart for Customer Segments
-plt.subplot(1, 2, 1)
-sns.countplot(x='Customer_Segment', data=data_cleaned, palette='viridis')
-plt.title('Customer Segments')
-plt.xlabel('Segment')
-plt.ylabel('Count')
+# Create a DataFrame for the table
+top_customer_stores = pd.DataFrame({
+    'Name': most_frequented_stores.index,
+    'Most Frequented Store': most_frequented_stores.values
+})
 
-# Scatter plot for Total Amount vs. Ratings
-plt.subplot(1, 2, 2)
-sns.scatterplot(x='Total_Amount', y='Ratings', hue='Customer_Segment', data=data_cleaned, palette='viridis')
-plt.title('Total Amount vs. Ratings')
-plt.xlabel('Total Amount')
-plt.ylabel('Ratings')
+# Print the table
+print(top_customer_stores)
 
-plt.tight_layout()
-plt.show()
+
+# Since we are dealing with categorical data (store names),
+# a bar chart is not the most suitable visualization.
+# Instead, we can display the information in a table format.
+
+# Export the table to a new CSV file
+top_customer_stores.to_csv('top_customer_stores.csv', index=False)
