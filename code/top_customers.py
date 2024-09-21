@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Load the cleaned dataset
-file_path = 'data/new_retail_data.csv'
+file_path = '../data/new_retail_data.csv'
 data_cleaned = pd.read_csv(file_path)
 
 # Handle missing values and correct data types
