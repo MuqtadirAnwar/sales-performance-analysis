@@ -29,5 +29,5 @@ print(top_customer_stores)
 # a bar chart is not the most suitable visualization.
 # Instead, we can display the information in a table format.
 
-# Export the table to a new CSV file
-top_customer_stores.to_csv('top_customer_stores.csv', index=False)
+# Export the table to a new CSV file in ../results/
+top_customer_stores.to_csv('../results/top_customer_stores.csv', index=False)
