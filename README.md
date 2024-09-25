@@ -71,7 +71,7 @@ pip install pandas matplotlib
 1. Ensure the input file (`new_retail_data.csv`) is in the `../data/` directory.
 2. Run the script:
    ```bash
-   python script_name.py
+   python top_customers.py
    ```
 3. Check the output CSV file (`top_customer_stores.csv`) in your current directory.
 
